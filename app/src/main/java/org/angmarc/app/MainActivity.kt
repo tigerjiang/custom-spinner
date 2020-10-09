@@ -65,6 +65,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         niceSpinner.notifyDataSetChanged(true)
+        niceSpinner.attachDataSource(people)
+        niceSpinner.setSelection(1)
     }
 
     private fun setupDefault() {
