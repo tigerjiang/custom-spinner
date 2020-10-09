@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         val item = niceSpinner.selectedItem
-        Log.d("jzh",if(item ==null) "is null" else (item as Person).name + " "+ niceSpinner.getSelectedIndex())
+        Log.d("jzh"," selectedItemPosition "+ niceSpinner.selectedItemPosition)
+        Log.d("jzh",if(item ==null) "is null" else (item as Person).name + " "+ niceSpinner.selectedItemPosition)
     }
 
     private fun setupXml() {
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         niceSpinner.attachDataSource(people)
+        niceSpinner.setSelection(1)
     }
 
     private fun setupDefault() {

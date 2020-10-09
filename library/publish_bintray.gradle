@@ -62,7 +62,7 @@ install {
             }
             developers {
                 developer {
-                    name 'libobo'
+                    name 'Tiger'
                 }
             }
         }

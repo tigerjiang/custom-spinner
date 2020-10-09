@@ -241,8 +241,15 @@ class NiceSpinner: AppCompatTextView {
     val selectedItem: Any?
         get() =  adapter!!.getItemInDataset(selectedIndex)
 
+    val selectedItemPosition: Int
+        get() = selectedIndex
+
     fun getSelectedIndex(): Int {
         return selectedIndex
+    }
+
+    fun setSelection(position: Int) {
+        setSelectedIndex(position)
     }
 
     fun setArrowDrawable(@DrawableRes @ColorRes drawableId: Int) {
