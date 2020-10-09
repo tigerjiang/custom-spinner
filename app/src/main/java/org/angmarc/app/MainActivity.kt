@@ -3,6 +3,7 @@ package org.angmarc.app
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,14 +12,22 @@ import org.angmarch.views.OnSpinnerItemSelectedListener
 import org.angmarch.views.SimpleSpinnerTextFormatter
 import org.angmarch.views.SpinnerTextFormatter
 import java.util.*
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
+   private lateinit var niceSpinner: NiceSpinner;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupDefault()
         setupTintedWithCustomClass()
         setupXml()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val item = niceSpinner.selectedItem
+        Log.d("jzh",if(item ==null) "is null" else (item as Person).name + " "+ niceSpinner.getSelectedIndex())
     }
 
     private fun setupXml() {
@@ -32,7 +41,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupTintedWithCustomClass() {
-        val spinner = findViewById<NiceSpinner>(R.id.tinted_nice_spinner)
+      niceSpinner = findViewById<NiceSpinner>(R.id.tinted_nice_spinner)
+        niceSpinner.setDefaultSelected(false)
         val people: MutableList<Person> = ArrayList()
         people.add(Person("Tony", "Stark"))
         people.add(Person("Steve", "Rogers"))
@@ -42,15 +52,15 @@ class MainActivity : AppCompatActivity() {
                 return SpannableString(person.name + " " + person.surname)
             }
         }
-        spinner.setSpinnerTextFormatter(textFormatter)
-        spinner.setSelectedTextFormatter(textFormatter)
-        spinner.onSpinnerItemSelectedListener = object : OnSpinnerItemSelectedListener {
+        niceSpinner.setSpinnerTextFormatter(textFormatter)
+        niceSpinner.setSelectedTextFormatter(textFormatter)
+        niceSpinner.onSpinnerItemSelectedListener = object : OnSpinnerItemSelectedListener {
             override fun onItemSelected(parent: NiceSpinner?, view: View?, position: Int, id: Long) {
-                val person = spinner.selectedItem as Person
+                val person = niceSpinner.selectedItem as Person
                 Toast.makeText(this@MainActivity, "Selected: $position $person", Toast.LENGTH_SHORT).show()
             }
         }
-        spinner.attachDataSource(people)
+        niceSpinner.attachDataSource(people)
     }
 
     private fun setupDefault() {
@@ -65,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
 
 internal class Person(val name: String, val surname: String) {
     override fun toString(): String {

@@ -27,14 +27,18 @@ class NiceSpinnerAdapterWrapper internal constructor(
         horizontalAlignment: PopUpTextAlignment?
 ) : NiceSpinnerBaseAdapter<Any?>(context, textColor, backgroundSelector, spinnerTextFormatter, horizontalAlignment) {
     override fun getCount(): Int {
-        return baseAdapter.count - 1
+        return  baseAdapter.count
     }
 
     override fun getItem(position: Int): Any {
-        return baseAdapter.getItem(if (position >= selectedIndex) position + 1 else position)
+        return baseAdapter.getItem(position)
     }
 
-    override fun getItemInDataset(position: Int): Any {
-        return baseAdapter.getItem(position)
+    override fun getItemInDataset(position: Int): Any? {
+        if(position < 0){
+            return null
+        }else {
+            return baseAdapter.getItem(position)
+        }
     }
 }

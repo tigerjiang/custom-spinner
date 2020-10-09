@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -39,8 +40,8 @@ import java.util.*
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-class NiceSpinner : AppCompatTextView {
-    private var selectedIndex = 0
+class NiceSpinner: AppCompatTextView {
+    private var selectedIndex = -1
     private var arrowDrawable: Drawable? = null
     private var popupWindow: ListPopupWindow? = null
     private var adapter: NiceSpinnerBaseAdapter<*>? = null
@@ -49,6 +50,9 @@ class NiceSpinner : AppCompatTextView {
     var onSpinnerItemSelectedListener: OnSpinnerItemSelectedListener? = null
     var isArrowHidden = false
         private set
+    //默认选中第一项目，如果不需要默认选中则设置为false
+    private var defaultSelected  = true;
+    private var spinnerPrompt = 0;
     private var tintColor = 0
     private var promptColor = 0
     private var backgroundSelector = 0
@@ -104,7 +108,7 @@ class NiceSpinner : AppCompatTextView {
             selectedIndex = bundle.getInt(SELECTED_INDEX)
             if (adapter != null) {
                 setTextInternal(selectedTextFormatter!!.format(adapter!!.getItemInDataset(selectedIndex)).toString())
-                adapter!!.setSelectedIndex(selectedIndex)
+                adapter!!.selectedIndex = selectedIndex
             }
             if (bundle.getBoolean(IS_POPUP_SHOWING)) {
                 if (popupWindow != null) {
@@ -131,14 +135,16 @@ class NiceSpinner : AppCompatTextView {
         setBackgroundResource(backgroundSelector)
         tintColor = typedArray.getColor(R.styleable.NiceSpinner_textTint, getDefaultTextColor(context))
         setTextColor(tintColor)
+        defaultSelected = typedArray.getBoolean(R.styleable.NiceSpinner_defaultSelected, defaultSelected)
+        spinnerPrompt = typedArray.getResourceId(R.styleable.NiceSpinner_promptText, R.string.prompt_text)
         promptColor = typedArray.getColor(R.styleable.NiceSpinner_promptColor, getDefaultTextColor(context))
         popupWindow = ListPopupWindow(context)
         popupWindow!!.setOnItemClickListener { parent, view, position, id -> // The selected item is not displayed within the list, so when the selected position is equal to
             // the one of the currently selected item it gets shifted to the next item.
-            var position = position
-            if (position >= 0 && position < adapter!!.count) {
-                position++
-            }
+//            var position = position
+//            if (!defaultSelected && position >= selectedIndex && position < adapter!!.count) {
+//                position++
+//            }
             selectedIndex = position
             if (onSpinnerItemSelectedListener != null) {
                 onSpinnerItemSelectedListener!!.onItemSelected(this@NiceSpinner, view, position, id)
@@ -149,7 +155,6 @@ class NiceSpinner : AppCompatTextView {
             if (onItemSelectedListener != null) {
                 onItemSelectedListener!!.onItemSelected(parent, view, position, id)
             }
-            adapter!!.setSelectedIndex(position)
             setTextInternal(adapter!!.getItemInDataset(position))
             dismissDropDown()
         }
@@ -229,12 +234,12 @@ class NiceSpinner : AppCompatTextView {
         return defaultTextColor
     }
 
-    fun getItemAtPosition(position: Int): Any {
+    fun getItemAtPosition(position: Int): Any? {
         return adapter!!.getItemInDataset(position)
     }
 
-    val selectedItem: Any
-        get() = adapter!!.getItemInDataset(selectedIndex)
+    val selectedItem: Any?
+        get() =  adapter!!.getItemInDataset(selectedIndex)
 
     fun getSelectedIndex(): Int {
         return selectedIndex
@@ -251,12 +256,8 @@ class NiceSpinner : AppCompatTextView {
         setArrowDrawableOrHide(arrowDrawable)
     }
 
-    private fun<T> setTextInternal(item: T) {
-        if (selectedIndex == 0) {
-            setTextColor(promptColor)
-        } else {
-            setTextColor(tintColor)
-        }
+    private fun <T> setTextInternal(item: T) {
+        setTextColor(tintColor)
         text = if (selectedTextFormatter != null) {
             selectedTextFormatter!!.format(item)
         } else {
@@ -272,7 +273,7 @@ class NiceSpinner : AppCompatTextView {
     fun setSelectedIndex(position: Int) {
         if (adapter != null) {
             if (position >= 0 && position <= adapter!!.count) {
-                adapter!!.setSelectedIndex(position)
+                adapter!!.selectedIndex = position
                 selectedIndex = position
                 setTextInternal(selectedTextFormatter!!.format(adapter!!.getItemInDataset(position)).toString())
             } else {
@@ -281,6 +282,14 @@ class NiceSpinner : AppCompatTextView {
         }
     }
 
+
+    fun setDefaultSelected(defaultSelected: Boolean) {
+        this.defaultSelected = defaultSelected
+    }
+
+    fun setPromptText(promptId: Int) {
+        this.spinnerPrompt = promptId
+    }
     @Deprecated("use setOnSpinnerItemSelectedListener instead.")
     fun addOnItemClickListener(onItemClickListener: OnItemClickListener?) {
         this.onItemClickListener = onItemClickListener
@@ -292,8 +301,9 @@ class NiceSpinner : AppCompatTextView {
     }
 
     fun <T> attachDataSource(list: List<T>) {
-        adapter = NiceSpinnerAdapter(context, list, tintColor, backgroundSelector, spinnerTextFormatter, popUpTextAlignment)
+        adapter = popUpTextAlignment?.let { NiceSpinnerAdapter(context, list, tintColor, backgroundSelector,spinnerTextFormatter, it) }
         setAdapterInternal(adapter)
+
     }
 
     fun setAdapter(adapter: ListAdapter?) {
@@ -304,12 +314,19 @@ class NiceSpinner : AppCompatTextView {
         setAdapterInternal(this.adapter)
     }
 
+
     private fun <T> setAdapterInternal(adapter: NiceSpinnerBaseAdapter<T>?) {
         if (adapter!!.count >= 0) {
             // If the adapter needs to be set again, ensure to reset the selected index as well
             selectedIndex = 0
             popupWindow!!.setAdapter(adapter)
-            setTextInternal(adapter.getItemInDataset(selectedIndex))
+            if (!defaultSelected) {
+                selectedIndex = -1
+                setText(spinnerPrompt)
+                setTextColor(promptColor)
+            } else {
+                setTextInternal(adapter.getItemInDataset(selectedIndex))
+            }
         }
     }
 

@@ -22,23 +22,22 @@ class NiceSpinnerAdapter<T> internal constructor(
         private val items: List<T>,
         textColor: Int,
         backgroundSelector: Int,
-        spinnerTextFormatter: SpinnerTextFormatter<*>?,
-        horizontalAlignment: PopUpTextAlignment?
+        spinnerTextFormatter: SpinnerTextFormatter<*>,
+        horizontalAlignment: PopUpTextAlignment
 ) : NiceSpinnerBaseAdapter<Any?>(context, textColor, backgroundSelector, spinnerTextFormatter, horizontalAlignment) {
     override fun getCount(): Int {
-        return items.size - 1
+        return  items.size
     }
 
-    override fun getItem(position: Int): T {
-//        return items.get(position);
-        return if (position >= 0) {
-            items[position + 1]
-        } else {
-            items[position]
+    override fun getItem(position: Int): Any {
+         return    items[position] as Any
+    }
+
+    override fun getItemInDataset(position: Int): Any? {
+        if(position < 0){
+            return null
+        }else {
+            return items[position] as Any
         }
-    }
-
-    override fun getItemInDataset(position: Int): T {
-        return items[position]
     }
 }

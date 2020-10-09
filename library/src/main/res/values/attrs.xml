@@ -9,6 +9,8 @@
     <declare-styleable name="NiceSpinner">
         <attr name="arrowTint" format="color" />
         <attr name="hideArrow" format="boolean" />
+        <attr name="defaultSelected" format="boolean" />
+        <attr name="promptText" format="string" />
         <attr name="arrowDrawable" format="reference|color" />
         <attr name="dropDownListPaddingBottom" format="dimension" />
         <attr name="backgroundSelector" format="integer" />
