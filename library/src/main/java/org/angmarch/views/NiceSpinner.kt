@@ -127,10 +127,10 @@ class NiceSpinner: AppCompatTextView {
         val resources = resources
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.NiceSpinner)
         val defaultPadding = resources.getDimensionPixelSize(R.dimen.one_and_a_half_grid_unit)
-        gravity = Gravity.CENTER_VERTICAL or Gravity.START
-        setPadding(resources.getDimensionPixelSize(R.dimen.three_grid_unit), defaultPadding, defaultPadding,
-                defaultPadding)
-        isClickable = true
+//        gravity = Gravity.CENTER_VERTICAL or Gravity.START
+//        setPadding(resources.getDimensionPixelSize(R.dimen.three_grid_unit), defaultPadding, defaultPadding,
+//                defaultPadding)
+//        isClickable = true
         backgroundSelector = typedArray.getResourceId(R.styleable.NiceSpinner_backgroundSelector, R.drawable.selector)
         setBackgroundResource(backgroundSelector)
         tintColor = typedArray.getColor(R.styleable.NiceSpinner_textTint, getDefaultTextColor(context))
@@ -241,8 +241,15 @@ class NiceSpinner: AppCompatTextView {
     val selectedItem: Any?
         get() =  adapter!!.getItemInDataset(selectedIndex)
 
+    val selectedItemPosition: Int
+        get() = selectedIndex
+
     fun getSelectedIndex(): Int {
         return selectedIndex
+    }
+
+    fun setSelection(position: Int) {
+        setSelectedIndex(position)
     }
 
     fun setArrowDrawable(@DrawableRes @ColorRes drawableId: Int) {
@@ -258,10 +265,18 @@ class NiceSpinner: AppCompatTextView {
 
     private fun <T> setTextInternal(item: T) {
         setTextColor(tintColor)
-        text = if (selectedTextFormatter != null) {
-            selectedTextFormatter!!.format(item)
+        if (item == null) {
+            text = "";
+            isArrowHidden = true
+            setArrowDrawable(arrowDrawable)
         } else {
-            item.toString()
+            text = if (selectedTextFormatter != null) {
+                selectedTextFormatter!!.format(item)
+            } else {
+                item.toString()
+            }
+            isArrowHidden = false
+            setArrowDrawable(arrowDrawable)
         }
     }
 
@@ -303,13 +318,12 @@ class NiceSpinner: AppCompatTextView {
     fun <T> attachDataSource(list: List<T>) {
         adapter = popUpTextAlignment?.let { NiceSpinnerAdapter(context, list, tintColor, backgroundSelector,spinnerTextFormatter, it) }
         setAdapterInternal(adapter)
-
     }
 
     fun setAdapter(adapter: ListAdapter?) {
         this.adapter = adapter?.let {
             NiceSpinnerAdapterWrapper(context, it, tintColor, backgroundSelector,
-                spinnerTextFormatter, popUpTextAlignment)
+                    spinnerTextFormatter, popUpTextAlignment)
         }
         setAdapterInternal(this.adapter)
     }
@@ -320,13 +334,28 @@ class NiceSpinner: AppCompatTextView {
             // If the adapter needs to be set again, ensure to reset the selected index as well
             selectedIndex = 0
             popupWindow!!.setAdapter(adapter)
-            if (!defaultSelected) {
-                selectedIndex = -1
-                setText(spinnerPrompt)
-                setTextColor(promptColor)
-            } else {
-                setTextInternal(adapter.getItemInDataset(selectedIndex))
-            }
+            setTextInternalExtra()
+        }
+    }
+
+    private fun setTextInternalExtra() {
+        if (!defaultSelected && (adapter?.count!! > 0)) {
+            selectedIndex = -1
+            setText(spinnerPrompt)
+            setTextColor(promptColor)
+            isArrowHidden = false
+            setArrowDrawable(arrowDrawable)
+        } else {
+            setTextInternal(adapter?.getItemInDataset(selectedIndex))
+        }
+    }
+
+    fun notifyDataSetChanged(refresh: Boolean) {
+        if (refresh) {
+            setTextInternalExtra()
+        }
+        if (adapter != null) {
+            adapter?.notifyDataSetChanged()
         }
     }
 

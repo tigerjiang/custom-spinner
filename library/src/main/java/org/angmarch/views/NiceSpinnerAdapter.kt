@@ -1,6 +1,7 @@
 package org.angmarch.views
 
 import android.content.Context
+import java.lang.Exception
 
 /*
 * Copyright (C) 2015 Angelo Marchesin.
@@ -34,10 +35,14 @@ class NiceSpinnerAdapter<T> internal constructor(
     }
 
     override fun getItemInDataset(position: Int): Any? {
-        if(position < 0){
+        try {
+            if(position < 0){
+                return null
+            }else {
+                return items[position] as Any
+            }
+        }catch (ex:Exception){
             return null
-        }else {
-            return items[position] as Any
         }
     }
 }

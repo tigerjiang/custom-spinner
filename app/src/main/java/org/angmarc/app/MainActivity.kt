@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,11 +28,13 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         val item = niceSpinner.selectedItem
-        Log.d("jzh",if(item ==null) "is null" else (item as Person).name + " "+ niceSpinner.getSelectedIndex())
+        Log.d("jzh"," selectedItemPosition "+ niceSpinner.selectedItemPosition)
+        Log.d("jzh",if(item ==null) "is null" else (item as Person).name + " "+ niceSpinner.selectedItemPosition)
     }
 
     private fun setupXml() {
         val spinner = findViewById<NiceSpinner>(R.id.niceSpinnerXml)
+        spinner.setTextSize(TypedValue.COMPLEX_UNIT_SP,30.0f)
         spinner.onSpinnerItemSelectedListener = object : OnSpinnerItemSelectedListener {
             override fun onItemSelected(parent: NiceSpinner?, view: View?, position: Int, id: Long) {
                 val item = parent!!.getItemAtPosition(position).toString()
@@ -44,9 +47,10 @@ class MainActivity : AppCompatActivity() {
       niceSpinner = findViewById<NiceSpinner>(R.id.tinted_nice_spinner)
         niceSpinner.setDefaultSelected(false)
         val people: MutableList<Person> = ArrayList()
-        people.add(Person("Tony", "Stark"))
-        people.add(Person("Steve", "Rogers"))
-        people.add(Person("Bruce", "Banner"))
+        niceSpinner.attachDataSource(people)
+//        people.add(Person("Tony", "Stark"))
+//        people.add(Person("Steve", "Rogers"))
+//        people.add(Person("Bruce", "Banner"))
         val textFormatter: SpinnerTextFormatter<*> = object : SimpleSpinnerTextFormatter() {
             fun format(person: Person): Spannable {
                 return SpannableString(person.name + " " + person.surname)
@@ -60,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Selected: $position $person", Toast.LENGTH_SHORT).show()
             }
         }
-        niceSpinner.attachDataSource(people)
+        niceSpinner.notifyDataSetChanged(true)
     }
 
     private fun setupDefault() {
