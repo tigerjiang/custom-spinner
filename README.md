@@ -17,6 +17,11 @@ The usage is pretty straightforward. Add the tag into the XML layout:
    android:id="@+id/nice_spinner"
    android:layout_width="wrap_content"
    android:layout_height="wrap_content"
+   app:promptColor="@color/colorPrompt" //不显示第一项的提示字符颜色
+   app:defaultSelected="true" //默认是否显示第一项
+   app:promptText="@string/prompt_text" //如果不显示第一项，那么设置提示的字符
+   app:textTint="@color/gray_dark" //选中后显示的字符颜色
+   app:background="@drawable/bg_white_corner_5_gray" //背景颜色
    android:layout_margin="16dp"/>
 ```
 * Note: change `layout_width` to at least the width of the largest item on the list to prevent resizing
@@ -63,12 +68,14 @@ With gradle: edit your `build.gradle`:
 allprojects {
     repositories {
         ...
-        maven { url "https://jitpack.io" }
+         maven {
+            url 'https://dl.bintray.com/tigerjiang/utils'
+        }
     }
 }
 
 dependencies {
-implementation 'com.github.tigerjiang:customSpinner:1.0.0'
+    implementation 'com.github.tigerjiang:NiceSpinner:2.3'
 }
 ```
 
