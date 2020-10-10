@@ -45,8 +45,8 @@ class NiceSpinner: AppCompatTextView {
     private var arrowDrawable: Drawable? = null
     private var popupWindow: ListPopupWindow? = null
     private var adapter: NiceSpinnerBaseAdapter<*>? = null
-    private var onItemClickListener: OnItemClickListener? = null
-    private var onItemSelectedListener: OnItemSelectedListener? = null
+    var onItemClickListener: OnItemClickListener? = null
+    var onItemSelectedListener: OnItemSelectedListener? = null
     var onSpinnerItemSelectedListener: OnSpinnerItemSelectedListener? = null
     var isArrowHidden = false
         private set
@@ -130,7 +130,7 @@ class NiceSpinner: AppCompatTextView {
 //        gravity = Gravity.CENTER_VERTICAL or Gravity.START
 //        setPadding(resources.getDimensionPixelSize(R.dimen.three_grid_unit), defaultPadding, defaultPadding,
 //                defaultPadding)
-//        isClickable = true
+        isClickable = true
         backgroundSelector = typedArray.getResourceId(R.styleable.NiceSpinner_backgroundSelector, R.drawable.selector)
         setBackgroundResource(backgroundSelector)
         tintColor = typedArray.getColor(R.styleable.NiceSpinner_textTint, getDefaultTextColor(context))
@@ -292,7 +292,11 @@ class NiceSpinner: AppCompatTextView {
                 selectedIndex = position
                 setTextInternal(selectedTextFormatter!!.format(adapter!!.getItemInDataset(position)).toString())
             } else {
-                throw IllegalArgumentException("Position must be lower than adapter count!")
+                if (position < 0 && position <= adapter!!.count) {
+                    setTextInternalExtra()
+                } else {
+                    throw IllegalArgumentException("Position must be lower than adapter count!")
+                }
             }
         }
     }
@@ -304,15 +308,6 @@ class NiceSpinner: AppCompatTextView {
 
     fun setPromptText(promptId: Int) {
         this.spinnerPrompt = promptId
-    }
-    @Deprecated("use setOnSpinnerItemSelectedListener instead.")
-    fun addOnItemClickListener(onItemClickListener: OnItemClickListener?) {
-        this.onItemClickListener = onItemClickListener
-    }
-
-    @Deprecated("use setOnSpinnerItemSelectedListener instead.")
-    fun setOnItemSelectedListener(onItemSelectedListener: OnItemSelectedListener?) {
-        this.onItemSelectedListener = onItemSelectedListener
     }
 
     fun <T> attachDataSource(list: List<T>) {

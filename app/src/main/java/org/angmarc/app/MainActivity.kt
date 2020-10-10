@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.angmarch.views.NiceSpinner
@@ -58,15 +59,15 @@ class MainActivity : AppCompatActivity() {
         }
         niceSpinner.setSpinnerTextFormatter(textFormatter)
         niceSpinner.setSelectedTextFormatter(textFormatter)
-        niceSpinner.onSpinnerItemSelectedListener = object : OnSpinnerItemSelectedListener {
-            override fun onItemSelected(parent: NiceSpinner?, view: View?, position: Int, id: Long) {
-                val person = niceSpinner.selectedItem as Person
-                Toast.makeText(this@MainActivity, "Selected: $position $person", Toast.LENGTH_SHORT).show()
+        niceSpinner.onItemClickListener = object : AdapterView.OnItemClickListener{
+            override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                TODO("Not yet implemented")
             }
+
         }
         niceSpinner.notifyDataSetChanged(true)
         niceSpinner.attachDataSource(people)
-        niceSpinner.setSelection(1)
+        niceSpinner.setSelection(-1)
     }
 
     private fun setupDefault() {
