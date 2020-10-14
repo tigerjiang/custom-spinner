@@ -290,6 +290,7 @@ class NiceSpinner: AppCompatTextView {
             if (position >= 0 && position <= adapter!!.count) {
                 adapter!!.selectedIndex = position
                 selectedIndex = position
+                onItemSelectedCallBack(position)
                 setTextInternal(selectedTextFormatter!!.format(adapter!!.getItemInDataset(position)).toString())
             } else {
                 if (position < 0 && position <= adapter!!.count) {
@@ -298,6 +299,21 @@ class NiceSpinner: AppCompatTextView {
                     throw IllegalArgumentException("Position must be lower than adapter count!")
                 }
             }
+        }
+    }
+
+    fun onItemSelectedCallBack(position: Int){
+        selectedIndex = position
+        if (onSpinnerItemSelectedListener != null) {
+            onSpinnerItemSelectedListener!!.onItemSelected(this@NiceSpinner, null, position, 0)
+        }
+        // 调用setSelection方法的时候不会回调AdapterView.OnItemClickListener,所以重写在此调用该方法
+        if (onItemClickListener != null) {
+            onItemClickListener!!.onItemClick(null, null, position, 0)
+        }
+
+        if (onItemSelectedListener != null) {
+            onItemSelectedListener!!.onItemSelected(null, null, position, 0)
         }
     }
 

@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity() {
         niceSpinner.setDefaultSelected(false)
         val people: MutableList<Person> = ArrayList()
         niceSpinner.attachDataSource(people)
-//        people.add(Person("Tony", "Stark"))
-//        people.add(Person("Steve", "Rogers"))
-//        people.add(Person("Bruce", "Banner"))
+        people.add(Person("Tony", "Stark"))
+        people.add(Person("Steve", "Rogers"))
+        people.add(Person("Bruce", "Banner"))
         val textFormatter: SpinnerTextFormatter<*> = object : SimpleSpinnerTextFormatter() {
             fun format(person: Person): Spannable {
                 return SpannableString(person.name + " " + person.surname)
@@ -61,13 +61,23 @@ class MainActivity : AppCompatActivity() {
         niceSpinner.setSelectedTextFormatter(textFormatter)
         niceSpinner.onItemClickListener = object : AdapterView.OnItemClickListener{
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.d("jzh",people[position].name)
+            }
+
+        }
+        niceSpinner.onItemSelectedListener  = object :AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.d("jzh-onItemSelectedListener ",people[position].name)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
                 TODO("Not yet implemented")
             }
 
         }
         niceSpinner.notifyDataSetChanged(true)
         niceSpinner.attachDataSource(people)
-        niceSpinner.setSelection(-1)
+        niceSpinner.setSelection(0)
     }
 
     private fun setupDefault() {
